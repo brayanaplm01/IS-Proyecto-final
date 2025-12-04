@@ -13,8 +13,20 @@ const nextConfig: NextConfig = {
       }
     ],
     unoptimized: false,
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  /* config options here */
+  experimental: {
+    optimizePackageImports: ['@heroicons/react'],
+  },
+  // Configuración optimizada para desarrollo
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
 };
 
 export default nextConfig;

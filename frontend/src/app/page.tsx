@@ -9,11 +9,11 @@ export default function Home() {
     <main className="min-h-screen w-full">
       {/* Hero Section */}
       <section className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-        {/* Background Elements */}
+        {/* Background Elements - Optimized */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-blue-500/30 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-32 right-16 w-32 h-32 bg-purple-500/30 rounded-full blur-xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-blue-400/40 rounded-full blur-lg animate-bounce delay-500"></div>
+          <div className="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-xl"></div>
+          <div className="absolute bottom-32 right-16 w-32 h-32 bg-purple-500/20 rounded-full blur-xl"></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-blue-400/30 rounded-full blur-lg"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
@@ -112,7 +112,8 @@ export default function Home() {
                     fill
                     style={{ objectFit: 'cover' }}
                     priority={true}
-                    className="transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="transition-transform duration-500 group-hover:scale-105"
                   />
                   
                   {/* Overlay */}
@@ -172,10 +173,10 @@ export default function Home() {
 
       {/* Products Showcase Section */}
       <section className="relative py-20 lg:py-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-        {/* Background Effects */}
+        {/* Background Effects - Optimized */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-10 w-24 h-24 bg-blue-500/40 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute bottom-1/3 right-16 w-32 h-32 bg-purple-500/30 rounded-full blur-2xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/4 left-10 w-24 h-24 bg-blue-500/30 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-1/3 right-16 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -304,13 +305,16 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="h-1 w-11/12 sm:w-3/4 mx-auto bg-gradient-to-r from-transparent via-purple-500 to-transparent rounded-full opacity-30 my-8" />
+
       {/* Shopping Process Section */}
       <section className="relative py-20 lg:py-32 bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 overflow-hidden">
-        {/* Background Effects */}
+        {/* Background Effects - Optimized */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/3 left-20 w-28 h-28 bg-green-500/40 rounded-full blur-2xl animate-pulse delay-500"></div>
-          <div className="absolute bottom-1/4 right-24 w-36 h-36 bg-blue-500/30 rounded-full blur-2xl animate-pulse delay-1500"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-purple-500/30 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-1/3 left-20 w-28 h-28 bg-green-500/30 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-1/4 right-24 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-purple-500/25 rounded-full blur-xl"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

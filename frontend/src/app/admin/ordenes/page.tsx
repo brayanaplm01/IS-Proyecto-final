@@ -72,20 +72,27 @@ const OrdenesAdminPage: React.FC = () => {
                  throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
             }
 
+            await response.json(); // Consumir la respuesta
+            
+            // Actualizar la lista de órdenes
             setOrdenes(ordenes.map(orden => 
                 orden.id === ordenId ? { ...orden, estado: nuevoEstado } : orden
             ));
 
+            // Actualizar la orden seleccionada en el modal
             if (selectedOrden && selectedOrden.id === ordenId) {
                  setSelectedOrden(prev => prev ? { ...prev, estado: nuevoEstado } : null);
              }
 
             console.log(`Estado de la orden ${ordenId} actualizado a ${nuevoEstado}`);
+            
+            // Mostrar mensaje de éxito
+            alert(`✓ Orden actualizada correctamente a estado: ${nuevoEstado === 'entregado' ? 'Entregado' : 'Pendiente'}`);
 
         } catch (err) {
             console.error('Error updating orden status:', err);
             const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-            alert(`Error al actualizar el estado: ${errorMessage}`);
+            alert(`✗ Error al actualizar el estado: ${errorMessage}`);
         }
     };
 

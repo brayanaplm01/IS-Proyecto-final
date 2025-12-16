@@ -343,8 +343,9 @@ const updateOrdenEstado = async (req, res) => {
       return res.status(404).json({ message: 'Orden no encontrada' });
     }
 
-    if (estado !== 'pendiente' && estado !== 'entregado') {
-      return res.status(400).json({ message: 'Estado inválido. Debe ser "pendiente" o "entregado".' });
+    const estadosValidos = ['pendiente', 'pagado', 'cancelado', 'entregado'];
+    if (!estadosValidos.includes(estado)) {
+      return res.status(400).json({ message: `Estado inválido. Debe ser uno de: ${estadosValidos.join(', ')}.` });
     }
 
     orden.estado = estado;

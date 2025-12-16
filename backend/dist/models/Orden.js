@@ -28,7 +28,7 @@ Orden.init({
     allowNull: false
   },
   estado: {
-    type: DataTypes.ENUM('pendiente', 'pagado', 'cancelado'),
+    type: DataTypes.ENUM('pendiente', 'pagado', 'cancelado', 'entregado'),
     defaultValue: 'pendiente'
   },
   fecha_orden: {

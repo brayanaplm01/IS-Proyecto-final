@@ -254,8 +254,12 @@ export default function ProductosPage() {
                         <div className="text-xs text-gray-500 truncate">{producto.descripcion}</div>
                       )}
                     </td>
-                    <td className="px-3 py-4 text-gray-700 text-sm truncate">{producto.marca?.nombre || '-'}</td>
-                    <td className="px-3 py-4 text-gray-700 text-sm truncate">{producto.categoria?.nombre || '-'}</td>
+                    <td className="px-3 py-4 text-gray-700 text-sm truncate">
+                      {producto.id_marca ? marcas.find(m => m.id_marca === producto.id_marca)?.nombre || '-' : '-'}
+                    </td>
+                    <td className="px-3 py-4 text-gray-700 text-sm truncate">
+                      {producto.id_categoria ? categorias.find(c => c.id_categoria === producto.id_categoria)?.nombre || '-' : '-'}
+                    </td>
                     <td className="px-3 py-4">
                       <span className="font-bold text-green-600 text-sm">${typeof producto.precio === 'number' ? producto.precio.toFixed(2) : parseFloat(String(producto.precio)).toFixed(2)}</span>
                     </td>

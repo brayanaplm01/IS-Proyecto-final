@@ -26,6 +26,13 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
     await onEstadoChange(orden.id, nuevoEstado);
   };
 
+  // Helper function to safely convert to number
+  const safeToFixed = (value: unknown, decimals: number = 2): string => {
+    if (value === null || value === undefined) return '0.00';
+    const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+    return isNaN(num) ? '0.00' : num.toFixed(decimals);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-fadeIn max-h-[90vh] overflow-y-auto">
@@ -66,11 +73,11 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
               <div className="space-y-2">
                 <div className="flex items-center text-gray-700">
                   <UserIcon className="w-4 h-4 mr-2 text-gray-400" />
-                  <span className="font-medium">{orden.User.nombre}</span>
+                  <span className="font-medium">{orden.User.nombre || 'N/A'}</span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <EnvelopeIcon className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>{orden.User.correo}</span>
+                  <span>{orden.User.correo || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -83,7 +90,7 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
                 <CurrencyDollarIcon className="w-5 h-5 mr-2" />
                 <span className="text-sm font-medium">Total</span>
               </div>
-              <p className="text-2xl font-bold text-blue-900">${parseFloat(orden.total.toString()).toFixed(2)}</p>
+              <p className="text-2xl font-bold text-blue-900">${safeToFixed(orden.total)}</p>
             </div>
 
             <div className="bg-purple-50 rounded-lg p-4">
@@ -147,13 +154,13 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="text-sm text-gray-700">{detalle.cantidad}</span>
+                          <span className="text-sm text-gray-700">{detalle.cantidad || 0}</span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-sm text-gray-700">${parseFloat(detalle.precioUnitario.toString()).toFixed(2)}</span>
+                          <span className="text-sm text-gray-700">${safeToFixed(detalle.precioUnitario)}</span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-sm font-semibold text-gray-900">${parseFloat(detalle.subtotal.toString()).toFixed(2)}</span>
+                          <span className="text-sm font-semibold text-gray-900">${safeToFixed(detalle.subtotal)}</span>
                         </td>
                       </tr>
                     ))}
@@ -162,7 +169,7 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
                     <tr>
                       <td colSpan={3} className="px-4 py-3 text-right font-semibold text-gray-900">Total:</td>
                       <td className="px-4 py-3 text-right font-bold text-lg text-gray-900">
-                        ${parseFloat(orden.total.toString()).toFixed(2)}
+                        ${safeToFixed(orden.total)}
                       </td>
                     </tr>
                   </tfoot>
@@ -198,4 +205,4 @@ const OrdenDetailModal: React.FC<OrdenDetailModalProps> = ({ isOpen, onClose, or
   );
 };
 
-export default OrdenDetailModal; 
+export default OrdenDetailModal;

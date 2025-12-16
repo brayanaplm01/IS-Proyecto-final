@@ -29,7 +29,7 @@ export default function MarcasPage() {
       setLoading(false);
     };
     if (token) fetchMarcas();
-  }, [token]);
+  }, [token, API]);
 
   const handleEliminar = async (id_marca: number) => {
     if (!confirm("¿Seguro que deseas eliminar esta marca?")) return;

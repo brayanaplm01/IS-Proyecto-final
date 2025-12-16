@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/AuthContext";
 
@@ -10,6 +10,7 @@ import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 import Notification from "@/components/Notification";
+import ProductFilters, { FilterState } from "@/components/ProductFilters";
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -22,6 +23,8 @@ interface ProductoAPI {
   cantidad: string | number;
   imagen?: string;
   tipo_producto: string;
+  id_marca?: number;
+  id_categoria?: number;
   marca?: { nombre: string };
   categoria?: { nombre: string };
 }
@@ -38,12 +41,32 @@ interface Producto {
   categoria?: { nombre: string };
 }
 
+interface Marca {
+  id_marca: number;
+  nombre: string;
+}
+
+interface Categoria {
+  id_categoria: number;
+  nombre: string;
+}
+
 export default function AccesoriosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterState>({
+    searchTerm: "",
+    selectedMarca: "",
+    selectedCategoria: "",
+    priceRange: [0, 10000],
+    sortBy: 'nombre',
+    onlyAvailable: false
+  });
   const addToCart = useCartStore((state) => state.addToCart);
   const { onLoginClick } = useAuth();
 
@@ -53,19 +76,38 @@ export default function AccesoriosPage() {
         setLoading(true);
         setError(null);
         
-        const res = await fetch(`${API}/api/productos`);
+        // Cargar productos, marcas y categorías en paralelo
+        const [resProductos, resMarcas, resCategorias] = await Promise.all([
+          fetch(`${API}/api/productos`),
+          fetch(`${API}/api/marcas`),
+          fetch(`${API}/api/categorias`)
+        ]);
         
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
+        if (!resProductos.ok || !resMarcas.ok || !resCategorias.ok) {
+          throw new Error('Error al cargar datos');
         }
         
-        const data = await res.json();
+        const dataProductos = await resProductos.json();
+        const dataMarcas: Marca[] = await resMarcas.json();
+        const dataCategorias: Categoria[] = await resCategorias.json();
         
-        const productosData = data.map((p: ProductoAPI): Producto => ({
-          ...p,
-          precio: parseFloat(String(p.precio)),
-          cantidad: parseInt(String(p.cantidad)),
-        }));
+        // Guardar marcas y categorías para los filtros
+        setMarcas(dataMarcas);
+        setCategorias(dataCategorias);
+        
+        // Mapear productos con sus marcas y categorías
+        const productosData = dataProductos.map((p: ProductoAPI): Producto => {
+          const marca = p.id_marca ? dataMarcas.find(m => m.id_marca === p.id_marca) : undefined;
+          const categoria = p.id_categoria ? dataCategorias.find(c => c.id_categoria === p.id_categoria) : undefined;
+          
+          return {
+            ...p,
+            precio: parseFloat(String(p.precio)),
+            cantidad: parseInt(String(p.cantidad)),
+            marca: marca ? { nombre: marca.nombre } : undefined,
+            categoria: categoria ? { nombre: categoria.nombre } : undefined
+          };
+        });
         
         const accesorios = productosData.filter((p: Producto) => p.tipo_producto === "accesorio");
         setProductos(accesorios);
@@ -102,6 +144,57 @@ export default function AccesoriosPage() {
     }
   };
 
+  // Aplicar filtros y ordenamiento
+  const productosFiltrados = useMemo(() => {
+    let filtered = [...productos];
+
+    // Filtro por búsqueda
+    if (filters.searchTerm) {
+      filtered = filtered.filter(p =>
+        p.nombre.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        p.marca?.nombre.toLowerCase().includes(filters.searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtro por marca
+    if (filters.selectedMarca) {
+      filtered = filtered.filter(p => p.marca?.nombre === filters.selectedMarca);
+    }
+
+    // Filtro por categoría
+    if (filters.selectedCategoria) {
+      filtered = filtered.filter(p => p.categoria?.nombre === filters.selectedCategoria);
+    }
+
+    // Filtro por precio
+    filtered = filtered.filter(p =>
+      p.precio >= filters.priceRange[0] && p.precio <= filters.priceRange[1]
+    );
+
+    // Filtro por disponibilidad
+    if (filters.onlyAvailable) {
+      filtered = filtered.filter(p => p.cantidad > 0);
+    }
+
+    // Ordenamiento
+    switch (filters.sortBy) {
+      case 'nombre':
+        filtered.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        break;
+      case 'precio-asc':
+        filtered.sort((a, b) => a.precio - b.precio);
+        break;
+      case 'precio-desc':
+        filtered.sort((a, b) => b.precio - a.precio);
+        break;
+      case 'stock':
+        filtered.sort((a, b) => b.cantidad - a.cantidad);
+        break;
+    }
+
+    return filtered;
+  }, [productos, filters]);
+
   return (
     <main className="min-h-screen w-full">
       {/* Page Header */}
@@ -135,6 +228,16 @@ export default function AccesoriosPage() {
             />
           )}
 
+          {/* Filters */}
+          {!loading && productos.length > 0 && (
+            <ProductFilters
+              marcas={marcas}
+              categorias={categorias}
+              onFilterChange={setFilters}
+              productCount={productosFiltrados.length}
+            />
+          )}
+
           {/* Content */}
           {loading ? (
             <LoadingSpinner message="Cargando accesorios profesionales..." />
@@ -149,9 +252,14 @@ export default function AccesoriosPage() {
               title={error ? "Error al cargar accesorios" : "No hay accesorios disponibles"}
               description="Inténtalo de nuevo más tarde o contacta con soporte."
             />
+          ) : productosFiltrados.length === 0 ? (
+            <EmptyState
+              title="No se encontraron productos"
+              description="Intenta ajustar los filtros de búsqueda para encontrar lo que buscas."
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {productos.map((producto) => (
+              {productosFiltrados.map((producto) => (
                 <ProductCard
                   key={producto.id_producto}
                   producto={producto}

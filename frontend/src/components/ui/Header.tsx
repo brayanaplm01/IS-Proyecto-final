@@ -58,10 +58,13 @@ export default function Header() {
                       Admin
                     </Link>
                   )}
-                  <div className="flex items-center space-x-2 text-gray-300">
+                  <Link 
+                    href="/perfil"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-gray-800/50"
+                  >
                     <UserIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">{user.nombre}</span>
-                  </div>
+                  </Link>
                   <button
                     onClick={logout}
                     className="px-4 py-2 text-sm font-semibold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-all duration-200 hover:scale-105"
@@ -131,12 +134,16 @@ export default function Header() {
                       Dashboard Admin
                     </Link>
                   )}
-                  <div className="px-4 py-2 text-gray-400">
+                  <Link
+                    href="/perfil"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                  >
                     <div className="flex items-center space-x-2">
                       <UserIcon className="w-4 h-4" />
-                      <span>Hola, {user.nombre}</span>
+                      <span>Mi Perfil</span>
                     </div>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => {
                       logout();

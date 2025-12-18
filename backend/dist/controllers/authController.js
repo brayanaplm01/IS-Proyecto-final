@@ -155,3 +155,58 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: 'Error interno del servidor al eliminar usuario' });
     }
 };
+
+// Función para actualizar el perfil del usuario autenticado
+exports.updateProfile = async (req, res) => {
+    try {
+        const userId = req.userId; // ID del usuario desde el middleware de autenticación
+        const { nombre, apellido_paterno, apellido_materno, correo, telefono, password } = req.body;
+
+        // Buscar el usuario por ID
+        const user = await User_1.default.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Verificar si el correo ya está en uso por otro usuario
+        if (correo !== user.correo) {
+            const existingUser = await User_1.default.findOne({ where: { correo } });
+            if (existingUser) {
+                return res.status(400).json({ error: 'El correo ya está en uso' });
+            }
+        }
+
+        // Actualizar los campos del usuario
+        user.nombre = nombre || user.nombre;
+        user.apellido_paterno = apellido_paterno || user.apellido_paterno;
+        user.apellido_materno = apellido_materno || user.apellido_materno;
+        user.correo = correo || user.correo;
+        user.telefono = telefono || user.telefono;
+
+        // Si se proporciona una nueva contraseña, actualizarla
+        if (password) {
+            user.contraseña = password; // El modelo se encargará del hash
+        }
+
+        // Guardar los cambios en la base de datos
+        await user.save();
+
+        res.json({
+            message: 'Perfil actualizado exitosamente',
+            usuario: {
+                id_usuario: user.id_usuario,
+                nombre: user.nombre,
+                apellido_paterno: user.apellido_paterno,
+                apellido_materno: user.apellido_materno,
+                correo: user.correo,
+                telefono: user.telefono,
+                rol: user.rol
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        res.status(500).json({ error: 'Error al actualizar el perfil' });
+    }
+};

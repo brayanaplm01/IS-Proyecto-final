@@ -385,6 +385,46 @@ const updateOrdenEstado = async (req, res) => {
   }
 };
 
+// Obtener órdenes del usuario autenticado
+const getUserOrdenes = async (req, res) => {
+  try {
+    const userId = req.userId; // Del middleware de autenticación
+
+    const ordenes = await Orden.findAll({
+      where: { usuario_id: userId },
+      include: [
+        {
+          model: User,
+          attributes: [
+            ['id_usuario', 'id'],
+            'nombre',
+            'correo'
+          ]
+        },
+        {
+          model: DetalleOrden,
+          include: [
+            {
+              model: Producto,
+              attributes: [
+                ['id_producto', 'id'],
+                'nombre',
+                'precio'
+              ]
+            }
+          ]
+        }
+      ],
+      order: [['fecha_orden', 'DESC']] // Más recientes primero
+    });
+
+    res.status(200).json(ordenes);
+  } catch (error) {
+    console.error('Error al obtener órdenes del usuario:', error);
+    res.status(500).json({ error: 'Error al obtener las órdenes', message: error.message });
+  }
+};
+
 module.exports = {
   generarQRPago,
   crearOrden,
@@ -392,5 +432,6 @@ module.exports = {
   generarFactura,
   updateOrdenTotal,
   getAllOrdenes,
-  updateOrdenEstado
+  updateOrdenEstado,
+  getUserOrdenes
 }; 
